@@ -5,6 +5,8 @@
 #include "common.h"
 using namespace std;
 
+// Comment for commit
+
 class Board {
    
 private:
