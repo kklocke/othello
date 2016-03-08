@@ -67,6 +67,10 @@ bool Board::hasMoves(Side side) {
     return false;
 }
 
+
+/*
+ * Return the number of moves available for a side
+ */
 int Board::numMoves(Side side) {
     int num = 0;
     for (int i = 0; i < 8; i++) {
@@ -78,6 +82,10 @@ int Board::numMoves(Side side) {
     return num;
 }
 
+
+/*
+ * Return a vector of valid moves given the board and side
+ */
 std::vector<Move> Board::validMoves(Side side) {
     std::vector<Move> movelist;
     for (int i = 0; i < 8; i++) {
@@ -204,7 +212,12 @@ void Board::setBoard(char data[]) {
     }
 }
 
+/*
+ * Compute the score of a board given the side and other side and
+ * a boolean telling if we are testing minimax
+ */
 int Board::heuristic(Side side, Side other, bool testing) {
+    // The heuristic weighted score board
     int weighted[64] = {
         100, -1, 1, 1, 1, 1, -1, 100,
         -1, -3, 1, 1, 1, 1, -3, -1,
@@ -215,6 +228,7 @@ int Board::heuristic(Side side, Side other, bool testing) {
         -1, -3, 1, 1, 1, 1, -3, -1,
         100, -1, 1, 1, 1, 1, -1, 100    
     };
+    // The unweighted score board for testing minimax
     int unweighted[64] = {
         1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1,
@@ -225,7 +239,7 @@ int Board::heuristic(Side side, Side other, bool testing) {
         1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1
     };
-
+    // Visit every position and add/subtract appropriately from score
     int score = 0;
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
