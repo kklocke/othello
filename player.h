@@ -22,7 +22,7 @@ public:
     bool testingMinimax;
 
     Board *board;
-    Move *move; //for global storage of current move 
+    Move *move;
     Side side;
     Side other;
 };
