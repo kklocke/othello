@@ -16,8 +16,14 @@ public:
     
     Move *doMove(Move *opponentsMove, int msLeft);
 
+<<<<<<< HEAD
     Move *computeMinimax(std::vector<Move> movelist);
 
+=======
+    Side side;
+    Side other;
+    Board *board;
+>>>>>>> 72470f7e9c87ba505319301d98313cce20123120
     // Flag to tell if the player is running within the test_minimax context
     bool testingMinimax;
 
