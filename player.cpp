@@ -11,6 +11,7 @@ Move *myMove = NULL;
  */
 Player::Player(Side side) {
     // Will be set to true in test_minimax.cpp.
+    move = NULL;
     this->side = side;
     other = (this->side == BLACK) ? WHITE : BLACK;
     board = new Board;
@@ -48,7 +49,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 	if (opponentsMove != NULL) {
         board->doMove(opponentsMove, other);
     }
-    Move maxMove(-1,-1);
+    /*Move maxMove(-1,-1);
     Board *workingBoard;
     int maxScore = std::numeric_limits<int>::min();
     for (int i = 0; i < 8; i++) {
@@ -57,16 +58,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
             if (board->checkMove(&tryMove, side)) {
                 workingBoard = board->copy();
                 workingBoard->doMove(&tryMove, side);
-                int myScore = workingBoard->count(side) - workingBoard->count(other);
-                if (tryMove.isCorner()) {
-                    myScore *= 3;
-                }
-                else if (tryMove.isByCorner()) {
-                    myScore *= -3;
-                }
-                else if (tryMove.isWall()) {
-                    myScore *= 2;
-                }
+                int myScore = workingBoard->heuristic(tryMove, side, other);
                 if (myScore > maxScore) {
                     maxScore = myScore;
                     maxMove.setX(i);
@@ -84,13 +76,80 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     }
     board->doMove(myMove, side);
 
+    return myMove; */
+
+
+
+    //
+
+    //std::vector<Move> validMoves = board->validMoves(side);
+    std::vector<Move> validMoves;
+    Move *myMove = computeMinimax(validMoves);
+    if (myMove != NULL) {
+        board->doMove(myMove, side);
+    }
     return myMove;
 }
 
 
 Move *Player::computeMinimax(std::vector<Move> movelist) {
-	if(movelist.size() == 0)
+    std::vector<Move> moves;
+for (int i = 0; i < 8; i++) {
+    for (int j = 0; j < 8; j++) {
+        Move myMove(i, j);
+        if (board->checkMove(&myMove, side)) {
+            moves.push_back(myMove);
+        }
+    }
+}
+Board *myBoard = NULL;
+int indexBestMove = -1;
+int scoreBestMove = std::numeric_limits<int>::min();
+for (int a = 0; a < (int)moves.size(); a++) {
+    myBoard = board->copy();
+    myBoard->doMove(&moves[a], side);
+    int worst = std::numeric_limits<int>::max();
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            Move myMove(i, j);
+            if (myBoard->checkMove(&myMove, other)) {
+                Board *tryBoard = myBoard->copy();
+                tryBoard->doMove(&myMove, other);
+                int tryScore = tryBoard->heuristic(side, other, testingMinimax);
+                if (tryScore < worst) {
+                    worst = tryScore;
+                }
+                delete tryBoard;
+            }
+        }
+    }
+    delete myBoard;
+    if (worst > scoreBestMove) {
+        scoreBestMove = worst;
+        indexBestMove = a;
+    }
+}
+if (indexBestMove != -1) {
+    Move *toMove = new Move(moves[indexBestMove].getX(), moves[indexBestMove].getY());
+    return toMove;
+}
+return NULL;
+
+
+
+
+
+
+
+
+
+	/*if(movelist.size() == 0) {
+        if (this->move !=  NULL) {
+            //delete this->move;
+        }
+        this->move = NULL;
 		return NULL;
+    }
 	int n = movelist.size();
 	Board *firstLayer = new Board[n];
 	int *worst_scores = new int[n];
@@ -106,8 +165,9 @@ Move *Player::computeMinimax(std::vector<Move> movelist) {
 	    for (unsigned int j = 0; j < secondLayerMoves.size(); j++) {
 	    	secondLayer[i][j] = *(firstLayer[i].copy());
 	    	secondLayer[i][j].doMove(&secondLayerMoves[j], other);
-	    	int score = secondLayer[i][j].count(side) - secondLayer[i][j].count(other);
-	    	std::cerr << "score: " << score << std::endl;
+	    	int score = secondLayer[i][j].heuristic(secondLayerMoves[j], side, other);
+            //int score = secondLayer[i][j].count(side) - secondLayer[i][j].count(other);
+	    	//std::cerr << "score: " << score << std::endl;
 	    	if(score < worst_scores[i]){
 	    		worst_scores[i] = score;
 	    	}
@@ -117,11 +177,13 @@ Move *Player::computeMinimax(std::vector<Move> movelist) {
 	this->move = new Move(movelist[0].getX(), movelist[0].getY());
 	for (unsigned int i = 1; i < movelist.size(); i++) {
 		if(worst_scores[i] > best_score)
+            if (this->move != NULL) {
+                //delete this->move;
+            }
 			this->move = new Move(movelist[i].getX(), movelist[i].getY());
     }
     delete[] firstLayer;
     delete[] secondLayer;
     delete[] worst_scores;
-    return this->move;
+    return this->move;*/
 }
-
