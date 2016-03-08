@@ -33,6 +33,7 @@ public:
     int count(Side side);
     int countBlack();
     int countWhite();
+    int heuristic(Side side, Side other, bool testing);
 
     void setBoard(char data[]);
 };
