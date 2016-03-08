@@ -203,3 +203,54 @@ void Board::setBoard(char data[]) {
         }
     }
 }
+
+int Board::heuristic(Side side, Side other, bool testing) {
+    int weight[64] = {
+    100, -1, 1, 1, 1, 1, -1, 100,
+    -1, -3, 1, 1, 1, 1, -3, -1,
+    5, 1, 1, 1, 1, 1, 1, 5,
+    5, 1, 1, 1, 1, 1, 1, 5,
+    5, 1, 1, 1, 1, 1, 1, 5,
+    5, 1, 1, 1, 1, 1, 1, 5,
+    -1, -3, 1, 1, 1, 1, -3, -1,
+    100, -1, 1, 1, 1, 1, -1, 100    
+    };
+    if (testing) {
+        weight = {
+            1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1
+    }
+
+    int score = 0;
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            if (taken[i + 8*j]) {
+                if (black[i + 8*j]) {
+                    if (side == BLACK) {
+                        score += weight[i + 8*j];
+                    }
+                    else {
+                        score -= weight[i + 8*j];
+                    }
+                }
+                else {
+                    if (side == BLACK) {
+                        score -= weight[i + 8*j];
+                    }
+                    else {
+                        score += weight[i + 8*j];
+                    }
+                }
+            }
+        }
+    }
+    return score;
+}
+
+
