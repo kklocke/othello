@@ -37,10 +37,11 @@ public:
             }
         }
         if ((x == 1) || (x == 6)) {
-            if ((y == 0) || (y == 7)) {
+            if ((y == 0) || (y == 7) || (y == 1) || (y == 6)) {
                 return true;
             }
         }
+
         return false;
     }
 
