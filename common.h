@@ -20,6 +20,7 @@ public:
 
     void setX(int x) { this->x = x; }
     void setY(int y) { this->y = y; }
+    // Check if a move is in the corner
     bool isCorner() {
         if ((x != 0) || (x != 7)) {
             return false;
@@ -29,7 +30,7 @@ public:
         }
         return true;
     }
-
+    // Check if a move is by a corner
     bool isByCorner() {
         if ((x == 0) || (x == 7)) {
             if ((y == 1) || (y == 6)) {
@@ -41,10 +42,9 @@ public:
                 return true;
             }
         }
-
         return false;
     }
-
+    // Check if a move is on a wall
     bool isWall() {
         if ((x == 0) || (x == 7) || (y == 0) || (y == 7)) {
             return true;
