@@ -3,18 +3,17 @@
 #include <cstdio>
 
 // GIT HYPED FOR OTHELLO BOIS
-Move *myMove = NULL;
 /*
  * Constructor for the player; initialize everything here. The side your AI is
  * on (BLACK or WHITE) is passed in as "side". The constructor must finish 
  * within 30 seconds.
  */
 Player::Player(Side side) {
-    // Will be set to true in test_minimax.cpp.
     move = NULL;
     this->side = side;
     other = (this->side == BLACK) ? WHITE : BLACK;
     board = new Board;
+    // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
     if (side == BLACK) {
         fprintf(stderr, "PLAYER IS BLACK\n");
@@ -29,7 +28,9 @@ Player::Player(Side side) {
  */
 Player::~Player() {
 	delete board;
-	delete move;
+    if (move != NULL) {
+        delete move;
+    }
 }
 
 /*
@@ -50,16 +51,22 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
         board->doMove(opponentsMove, other);
     }
     Move *myMove = computeMinimax();
-    //recurMinimax(board, 0, 4, side, other);
     if (myMove != NULL) {
         board->doMove(myMove, side);
     }
-    //Move *myMove = new Move(move->getX(), move->getY());
     return myMove;
 }
 
 
+
+
+/*
+ * Apply a 2-ply minimax method for finding the best choice of move
+ * Return a pointer to the move with the highest worst score at 2-ply
+ * Return NULL if pass/no move
+ */
 Move *Player::computeMinimax() {
+    // Get all possible moves for the player
     std::vector<Move> moves;
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
@@ -69,6 +76,7 @@ Move *Player::computeMinimax() {
             }
         }
     }
+    // For each of these moves, try all the opponents next moves
     Board *myBoard = NULL;
     int indexBestMove = -1;
     int scoreBestMove = std::numeric_limits<int>::min();
@@ -82,6 +90,7 @@ Move *Player::computeMinimax() {
                 if (myBoard->checkMove(&myMove, other)) {
                     Board *tryBoard = myBoard->copy();
                     tryBoard->doMove(&myMove, other);
+                    // Update the worst score appropriately
                     int tryScore = tryBoard->heuristic(side, other, testingMinimax);
                     if (tryScore < worst) {
                         worst = tryScore;
@@ -91,11 +100,13 @@ Move *Player::computeMinimax() {
             }
         }
         delete myBoard;
+        // If this move has a better worst score than the current best, update
         if (worst > scoreBestMove) {
             scoreBestMove = worst;
             indexBestMove = a;
         }
     }
+    // Return the appropriate move
     if (indexBestMove != -1) {
         Move *toMove = new Move(moves[indexBestMove].getX(), moves[indexBestMove].getY());
         return toMove;
@@ -103,6 +114,9 @@ Move *Player::computeMinimax() {
     return NULL;
 }
 
+
+
+// A work in progress below. Please disregard.
 
 /*int Player::recurMinimax(Board *board, int depth, int maxDepth, Side play, Side watch) {
     if (depth == maxDepth) {
