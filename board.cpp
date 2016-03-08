@@ -67,6 +67,31 @@ bool Board::hasMoves(Side side) {
     return false;
 }
 
+int Board::numMoves(Side side) {
+    int num = 0;
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            Move move(i, j);
+            if (checkMove(&move, side)) num++;
+        }
+    }
+    return num;
+}
+
+std::vector<Move> Board::validMoves(Side side) {
+    std::vector<Move> movelist;
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            Move move(i, j);
+            if (checkMove(&move, side)){
+                //std::cerr << move.getX() << ", " << move.getY() << std::endl;
+                movelist.push_back(move);
+            }
+        }
+    }
+    return movelist;
+}
+
 /*
  * Returns true if a move is legal for the given side; false otherwise.
  */

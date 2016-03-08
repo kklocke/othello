@@ -11,17 +11,17 @@ Player::Player(Side side) {
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
 
-    /* 
-     * TODO: Do any initialization you need to do here (setting up the board,
-     * precalculating things, etc.) However, remember that you will only have
-     * 30 seconds.
-     */
+    board = new Board();
+    this->side = side;
+    other = (side == BLACK) ? WHITE : BLACK;
 }
 
 /*
  * Destructor for the player.
  */
 Player::~Player() {
+	delete board;
+	delete move;
 }
 
 /*
@@ -37,9 +37,67 @@ Player::~Player() {
  * return NULL.
  */
 Move *Player::doMove(Move *opponentsMove, int msLeft) {
-    /* 
-     * TODO: Implement how moves your AI should play here. You should first
-     * process the opponent's opponents move before calculating your own move
-     */ 
-    return NULL;
+	board->doMove(opponentsMove, other);
+    
+    std::vector<Move> movelist = board->validMoves(side);
+    for (unsigned int i = 0; i < movelist.size(); i++) {
+        std::cerr << "move: " << movelist[i].getX() << ", " << movelist[i].getY() << std::endl;
+    }
+ //    if(movelist.size() != 0){
+ //    	board->doMove(&movelist[0], side);
+ //    	std::cerr << "move taken: " << movelist[0].getX() << ", " << movelist[0].getY() << std::endl;
+ //    	this->move = new Move(movelist[0].getX(), movelist[0].getY());
+	// 	return (this->move);
+ //    }
+	// else{
+	// 	return NULL;
+	// }
+	computeMinimax(movelist);
+	if(movelist.size() != 0)
+	{
+		board->doMove(this->move, side);
+		return this->move;
+	}
+	else
+	{
+		return NULL;
+	}
+
+}
+
+Move *Player::computeMinimax(std::vector<Move> movelist) {
+	if(movelist.size() == 0)
+		return NULL;
+	int n = movelist.size();
+	Board *firstLayer = new Board[n];
+	int *worst_scores = new int[n];
+	for (unsigned int i = 0; i < movelist.size(); i++) {
+		firstLayer[i] = *(board->copy());
+        firstLayer[i].doMove(&movelist[i], side);
+        worst_scores[i] = std::numeric_limits<int>::max();
+    }
+    Board **secondLayer = new Board*[movelist.size()];
+	for (unsigned int i = 0; i < movelist.size(); i++) {
+		std::vector<Move> secondLayerMoves = firstLayer[i].validMoves(other);
+	    secondLayer[i] = new Board[secondLayerMoves.size()];
+	    for (unsigned int j = 0; j < secondLayerMoves.size(); j++) {
+	    	secondLayer[i][j] = *(firstLayer[i].copy());
+	    	secondLayer[i][j].doMove(&secondLayerMoves[j], other);
+	    	int score = secondLayer[i][j].count(side) - secondLayer[i][j].count(other);
+	    	std::cerr << "score: " << score << std::endl;
+	    	if(score < worst_scores[i]){
+	    		worst_scores[i] = score;
+	    	}
+	    }
+	}
+	int best_score = worst_scores[0];
+	this->move = new Move(movelist[0].getX(), movelist[0].getY());
+	for (unsigned int i = 1; i < movelist.size(); i++) {
+		if(worst_scores[i] > best_score)
+			this->move = new Move(movelist[i].getX(), movelist[i].getY());
+    }
+    delete[] firstLayer;
+    delete[] secondLayer;
+    delete[] worst_scores;
+    return this->move;
 }
